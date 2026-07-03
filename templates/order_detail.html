@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}Order #{{ order['order_id'] }}{% endblock %}
+{% block content %}
+
+<header class="page-head">
+  <div>
+    <span class="eyebrow">Table {{ order['label'] }}</span>
+    <h1>Order #{{ order['order_id'] }}</h1>
+  </div>
+  <a href="{{ url_for('orders') }}" class="btn btn-ghost">&larr; All orders</a>
+</header>
+
+<section class="split-grid split-grid-wide">
+
+  <div class="panel">
+    <h2>Add items</h2>
+    {% if order['status'] == 'open' %}
+    <form method="POST" action="{{ url_for('order_add_item', order_id=order['order_id']) }}" class="form-row">
+      <select name="item_id" required>
+        <option value="" disabled selected>Choose a dish&hellip;</option>
+        {% for item in available_items %}
+          <option value="{{ item['item_id'] }}">{{ item['name'] }} &middot; &#8377;{{ "%.2f"|format(item['price']) }}</option>
+        {% endfor %}
+      </select>
+      <input type="number" name="quantity" min="1" value="1" required class="qty-input">
+      <button type="submit" class="btn btn-secondary">Fire item</button>
+    </form>
+    {% else %}
+    <p class="empty">This order is closed. View the bill on the right.</p>
+    {% endif %}
+
+    {% if order['status'] == 'open' %}
+    <h2 class="mt">Close out</h2>
+    <form method="POST" action="{{ url_for('generate_bill', order_id=order['order_id']) }}" class="form-row" onsubmit="return confirm('Generate the bill and free this table?');">
+      <input type="number" name="discount_pct" min="0" max="100" step="1" value="0" placeholder="Discount %">
+      <button type="submit" class="btn btn-primary" {{ 'disabled' if subtotal == 0 }}>Generate bill</button>
+    </form>
+    {% elif bill %}
+    <h2 class="mt">Bill</h2>
+    <a href="{{ url_for('bill_detail', order_id=order['order_id']) }}" class="btn btn-primary">View bill &rarr;</a>
+    {% endif %}
+  </div>
+
+  <div class="ticket">
+    <div class="ticket-notch"></div>
+    <div class="ticket-head">
+      <span>ORDER&nbsp;#{{ order['order_id'] }}</span>
+      <span>TABLE&nbsp;{{ order['label'] }}</span>
+    </div>
+    <div class="ticket-meta">{{ order['created_at'] }} &middot; <span class="pill pill-{{ 'open' if order['status']=='open' else 'closed' }}">{{ order['status'] }}</span></div>
+    <div class="ticket-rule"></div>
+
+    {% if line_items %}
+    <table class="ticket-table">
+      {% for li in line_items %}
+      <tr>
+        <td class="ticket-qty">{{ li['quantity'] }}&times;</td>
+        <td class="ticket-name">{{ li['name'] }}</td>
+        <td class="ticket-amt mono">{{ "%.2f"|format(li['line_total']) }}</td>
+        <td class="ticket-x">
+          {% if order['status'] == 'open' %}
+          <form method="POST" action="{{ url_for('order_remove_item', order_id=order['order_id'], line_id=li['id']) }}" class="inline-form">
+            <button type="submit" title="Remove item">&times;</button>
+          </form>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+    {% else %}
+    <p class="empty">No items fired yet.</p>
+    {% endif %}
+
+    <div class="ticket-rule"></div>
+    <div class="ticket-total">
+      <span>SUBTOTAL</span>
+      <span class="mono">&#8377;{{ "%.2f"|format(subtotal) }}</span>
+    </div>
+    <div class="ticket-notch ticket-notch-bottom"></div>
+  </div>
+
+</section>
+
+{% endblock %}

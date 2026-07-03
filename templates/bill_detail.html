@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Bill #{{ bill['bill_id'] }}{% endblock %}
+{% block content %}
+
+<header class="page-head">
+  <div>
+    <span class="eyebrow">Table {{ order['label'] }} &middot; Order #{{ order['order_id'] }}</span>
+    <h1>Bill #{{ bill['bill_id'] }}</h1>
+  </div>
+  <a href="{{ url_for('bills') }}" class="btn btn-ghost">&larr; All bills</a>
+</header>
+
+<section class="split-grid split-grid-wide">
+  <div class="panel">
+    <h2>Summary</h2>
+    <p class="muted">This check was closed on {{ bill['created_at'] }}. The table has been freed and is ready for the next guests.</p>
+    <a href="{{ url_for('tables') }}" class="btn btn-secondary">View floor plan</a>
+    <a href="{{ url_for('orders') }}" class="btn btn-primary">Seat another table</a>
+  </div>
+
+  <div class="ticket">
+    <div class="ticket-notch"></div>
+    <div class="ticket-head">
+      <span>BILL&nbsp;#{{ bill['bill_id'] }}</span>
+      <span>TABLE&nbsp;{{ order['label'] }}</span>
+    </div>
+    <div class="ticket-meta">{{ bill['created_at'] }}</div>
+    <div class="ticket-rule"></div>
+
+    <table class="ticket-table">
+      {% for li in line_items %}
+      <tr>
+        <td class="ticket-qty">{{ li['quantity'] }}&times;</td>
+        <td class="ticket-name">{{ li['name'] }}</td>
+        <td class="ticket-amt mono">{{ "%.2f"|format(li['line_total']) }}</td>
+        <td class="ticket-x"></td>
+      </tr>
+      {% endfor %}
+    </table>
+
+    <div class="ticket-rule"></div>
+    <div class="ticket-total">
+      <span>Subtotal</span>
+      <span class="mono">&#8377;{{ "%.2f"|format(bill['subtotal']) }}</span>
+    </div>
+    {% if bill['discount'] > 0 %}
+    <div class="ticket-total">
+      <span>Discount</span>
+      <span class="mono">&minus;&#8377;{{ "%.2f"|format(bill['discount']) }}</span>
+    </div>
+    {% endif %}
+    <div class="ticket-total">
+      <span>Tax</span>
+      <span class="mono">&#8377;{{ "%.2f"|format(bill['tax']) }}</span>
+    </div>
+    <div class="ticket-rule"></div>
+    <div class="ticket-total ticket-total-grand">
+      <span>TOTAL</span>
+      <span class="mono">&#8377;{{ "%.2f"|format(bill['total']) }}</span>
+    </div>
+    <div class="ticket-notch ticket-notch-bottom"></div>
+  </div>
+</section>
+
+{% endblock %}

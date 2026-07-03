@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Tables{% endblock %}
+{% block content %}
+
+<header class="page-head">
+  <div>
+    <span class="eyebrow">Floor plan</span>
+    <h1>Tables</h1>
+  </div>
+  <button class="btn btn-primary" onclick="toggleDrawer('table-drawer')">+ Add table</button>
+</header>
+
+<div id="table-drawer" class="drawer">
+  <form method="POST" action="{{ url_for('tables_add') }}" class="form-row">
+    <input type="text" name="label" placeholder="Label (e.g. T7)" required>
+    <input type="number" min="1" name="capacity" placeholder="Seats" required>
+    <button type="submit" class="btn btn-secondary">Save table</button>
+  </form>
+</div>
+
+<section class="table-grid">
+  {% for t in tables %}
+  <div class="table-card table-card-{{ t['status'] }}">
+    <span class="table-card-label">{{ t['label'] }}</span>
+    <span class="table-card-capacity">{{ t['capacity'] }} seats</span>
+    <span class="pill pill-{{ 'open' if t['status']=='free' else 'closed' }}">{{ t['status'] }}</span>
+    {% if t['status'] == 'occupied' %}
+      <form method="POST" action="{{ url_for('tables_free', table_id=t['table_id']) }}" onsubmit="return confirm('Mark this table free without billing? Only do this to fix a mistake.');">
+        <button type="submit" class="btn-mini">Force free</button>
+      </form>
+    {% else %}
+      <a href="{{ url_for('orders') }}" class="btn-mini">Seat guests</a>
+    {% endif %}
+  </div>
+  {% endfor %}
+</section>
+
+{% endblock %}

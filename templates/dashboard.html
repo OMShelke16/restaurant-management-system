@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+
+<header class="page-head">
+  <div>
+    <span class="eyebrow">Service overview</span>
+    <h1>Tonight&rsquo;s pass</h1>
+  </div>
+  <a href="{{ url_for('orders') }}" class="btn btn-primary">+ New Order</a>
+</header>
+
+<section class="stat-grid">
+  <div class="stat-card">
+    <span class="stat-label">Open orders</span>
+    <span class="stat-value">{{ open_orders }}</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-label">Tables free</span>
+    <span class="stat-value">{{ free_tables }}<small>/{{ total_tables }}</small></span>
+  </div>
+  <div class="stat-card stat-accent">
+    <span class="stat-label">Today&rsquo;s revenue</span>
+    <span class="stat-value mono">&#8377;{{ "%.2f"|format(today_revenue) }}</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-label">Bills closed today</span>
+    <span class="stat-value">{{ today_bills }}</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-label">Menu items</span>
+    <span class="stat-value">{{ menu_items }}</span>
+  </div>
+</section>
+
+<section class="split-grid">
+  <div class="panel">
+    <h2>Recent orders</h2>
+    {% if recent_orders %}
+      <table class="table">
+        <thead><tr><th>Order</th><th>Table</th><th>Status</th><th>Opened</th></tr></thead>
+        <tbody>
+          {% for o in recent_orders %}
+          <tr onclick="window.location='{{ url_for('order_detail', order_id=o['order_id']) }}'">
+            <td class="mono">#{{ o['order_id'] }}</td>
+            <td>{{ o['label'] }}</td>
+            <td><span class="pill pill-{{ 'open' if o['status']=='open' else 'closed' }}">{{ o['status'] }}</span></td>
+            <td class="muted">{{ o['created_at'] }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p class="empty">No orders yet. Fire up service from the Orders page.</p>
+    {% endif %}
+  </div>
+
+  <div class="panel">
+    <h2>Top sellers</h2>
+    {% if top_items %}
+      <ol class="rank-list">
+        {% for item in top_items %}
+        <li><span>{{ item['name'] }}</span><span class="mono">{{ item['qty'] }}&times;</span></li>
+        {% endfor %}
+      </ol>
+    {% else %}
+      <p class="empty">Sales data will appear here once orders start closing out.</p>
+    {% endif %}
+  </div>
+</section>
+
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Orders{% endblock %}
+{% block content %}
+
+<header class="page-head">
+  <div>
+    <span class="eyebrow">Floor &amp; kitchen</span>
+    <h1>Orders</h1>
+  </div>
+</header>
+
+<section class="panel">
+  <h2>Seat a table</h2>
+  {% if free_tables %}
+  <form method="POST" action="{{ url_for('orders_create') }}" class="form-row">
+    <select name="table_id" required>
+      <option value="" disabled selected>Choose a free table&hellip;</option>
+      {% for t in free_tables %}
+        <option value="{{ t['table_id'] }}">{{ t['label'] }} &middot; {{ t['capacity'] }} seats</option>
+      {% endfor %}
+    </select>
+    <button type="submit" class="btn btn-primary">Open order</button>
+  </form>
+  {% else %}
+  <p class="empty">Every table is occupied right now. Free one up on the Tables page or bill out an order.</p>
+  {% endif %}
+</section>
+
+<section class="panel">
+  <h2>Open orders</h2>
+  {% if open_orders %}
+  <table class="table">
+    <thead><tr><th>Order</th><th>Table</th><th>Running total</th><th>Opened</th><th></th></tr></thead>
+    <tbody>
+      {% for o in open_orders %}
+      <tr onclick="window.location='{{ url_for('order_detail', order_id=o['order_id']) }}'">
+        <td class="mono">#{{ o['order_id'] }}</td>
+        <td>{{ o['label'] }}</td>
+        <td class="mono">&#8377;{{ "%.2f"|format(o['running_total']) }}</td>
+        <td class="muted">{{ o['created_at'] }}</td>
+        <td><span class="link-arrow">View &rarr;</span></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="empty">No open orders. Seat a table above to start a ticket.</p>
+  {% endif %}
+</section>
+
+{% endblock %}

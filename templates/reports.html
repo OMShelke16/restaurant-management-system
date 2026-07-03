@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Reports{% endblock %}
+{% block content %}
+
+<header class="page-head">
+  <div>
+    <span class="eyebrow">Numbers from the pass</span>
+    <h1>Reports</h1>
+  </div>
+</header>
+
+<section class="stat-grid">
+  <div class="stat-card stat-accent">
+    <span class="stat-label">All-time revenue</span>
+    <span class="stat-value mono">&#8377;{{ "%.2f"|format(total_revenue) }}</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-label">All-time bills</span>
+    <span class="stat-value">{{ total_bills }}</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-label">Today&rsquo;s revenue</span>
+    <span class="stat-value mono">&#8377;{{ "%.2f"|format(today_revenue) }}</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-label">Today&rsquo;s bills</span>
+    <span class="stat-value">{{ today_bills }}</span>
+  </div>
+</section>
+
+<section class="split-grid">
+  <div class="panel">
+    <h2>Top selling items</h2>
+    {% if top_items %}
+    <table class="table">
+      <thead><tr><th>Item</th><th>Category</th><th>Qty sold</th><th>Revenue</th></tr></thead>
+      <tbody>
+        {% for item in top_items %}
+        <tr>
+          <td>{{ item['name'] }}</td>
+          <td class="muted">{{ item['category'] }}</td>
+          <td class="mono">{{ item['qty'] }}</td>
+          <td class="mono">&#8377;{{ "%.2f"|format(item['revenue']) }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p class="empty">No sales data yet.</p>
+    {% endif %}
+  </div>
+
+  <div class="panel">
+    <h2>Daily sales (last 14 days with activity)</h2>
+    {% if daily_sales %}
+    <table class="table">
+      <thead><tr><th>Date</th><th>Bills</th><th>Revenue</th></tr></thead>
+      <tbody>
+        {% for d in daily_sales %}
+        <tr>
+          <td class="muted">{{ d['day'] }}</td>
+          <td class="mono">{{ d['bill_count'] }}</td>
+          <td class="mono">&#8377;{{ "%.2f"|format(d['revenue']) }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p class="empty">No sales data yet.</p>
+    {% endif %}
+  </div>
+</section>
+
+{% endblock %}

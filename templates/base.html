@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}Dashboard{% endblock %} · The Pass</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<div class="shell">
+  <aside class="rail">
+    <div class="rail-brand">
+      <span class="rail-brand-mark">&#9670;</span>
+      <div class="rail-brand-text">
+        <strong>THE&nbsp;PASS</strong>
+        <small>kitchen &amp; floor control</small>
+      </div>
+    </div>
+
+    <nav class="rail-nav">
+      <a href="{{ url_for('dashboard') }}" class="{{ 'active' if request.endpoint == 'dashboard' }}">
+        <span class="rail-num">01</span> Dashboard
+      </a>
+      <a href="{{ url_for('orders') }}" class="{{ 'active' if request.endpoint in ['orders','order_detail'] }}">
+        <span class="rail-num">02</span> Orders
+      </a>
+      <a href="{{ url_for('tables') }}" class="{{ 'active' if request.endpoint == 'tables' }}">
+        <span class="rail-num">03</span> Tables
+      </a>
+      <a href="{{ url_for('menu') }}" class="{{ 'active' if request.endpoint == 'menu' }}">
+        <span class="rail-num">04</span> Menu
+      </a>
+      <a href="{{ url_for('bills') }}" class="{{ 'active' if request.endpoint in ['bills','bill_detail'] }}">
+        <span class="rail-num">05</span> Bills
+      </a>
+      <a href="{{ url_for('reports') }}" class="{{ 'active' if request.endpoint == 'reports' }}">
+        <span class="rail-num">06</span> Reports
+      </a>
+    </nav>
+
+    <div class="rail-foot">
+      <span class="dot-live"></span> Service is live
+    </div>
+  </aside>
+
+  <main class="stage">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-stack">
+          {% for category, message in messages %}
+            <div class="flash flash-{{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </main>
+</div>
+
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
